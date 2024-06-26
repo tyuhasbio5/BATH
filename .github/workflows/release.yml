@@ -1,0 +1,63 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers the workflow when a tag starting with 'v' is pushed
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        arch: [x86, x64, arm]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up build environment
+        run: |
+          if [ ${{ matrix.os }} == 'ubuntu-latest' ]; then
+            sudo apt-get update
+            sudo apt-get install -y gcc
+          elif [ ${{ matrix.os }} == 'windows-latest' ]; then
+            choco install mingw
+          elif [ ${{ matrix.os }} == 'macos-latest' ]; then
+            brew install gcc
+          fi
+
+      - name: Build
+        run: |
+          gcc -o my_program source_code.c
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: my_program-${{ matrix.os }}-${{ matrix.arch }}
+          path: my_program
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: path/to/artifacts
+          asset_name: my_program-${{ matrix.os }}-${{ matrix.arch }}
+          asset_content_type: application/octet-stream
