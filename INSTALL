@@ -1,0 +1,18 @@
+Brief installation instructions 
+BATH (Oct 2022)
+
+Install source code from GitHub:
+   git clone https://github.com/TravisWheelerLab/BATH.git
+   cd BATH
+   git clone https://github.com/TravisWheelerLab/easel
+   (cd easel; git checkout BATH)
+   autoconf
+   ./configure
+   make
+   make check                        # optional: automated tests
+   make install                      # optional: install BATH programs and man pages
+
+
+
+
+

@@ -1,0 +1,236 @@
+# BATH's test suite, in sqc command format
+#
+# See the ../easel/devkit/sqc script for documentation of sqc.
+#
+# Usage:  
+#     sqc <level> testsuite.sqc <top_builddir> <top_srcdir>
+# Example:  
+#     cd build-debug
+#     sqc 1 ../testsuite/valgrind.sqc . ..
+#
+# level 1 = the standard test suite 
+# level 2 = (currently nothing)
+# level 3 = valgrind tests
+#
+# Remember, sqc does three types of file substitution on this file:
+#   @foo@  = executables in the build directory => top_builddir/foo
+#   !foo!  = data files in the source directory => top_srcdir/foo
+#   %FOO%  = tmp files, created, managed, cleaned up by sqc itself
+#
+
+
+################################################################
+# Unit test drivers for each .c file
+################################################################
+
+1 exercise hmmer              @src/hmmer_utest@
+1 exercise build              @src/build_utest@
+1 exercise generic_fwdback    @src/generic_fwdback_utest@
+1 exercise generic_msv        @src/generic_msv_utest@
+1 exercise generic_stotrace   @src/generic_stotrace_utest@
+1 exercise generic_viterbi    @src/generic_viterbi_utest@
+1 exercise hmmd_search_status    @src/hmmd_search_status_utest@
+1 exercise logsum             @src/logsum_utest@
+1 exercise modelconfig        @src/modelconfig_utest@
+1 exercise seqmodel           @src/seqmodel_utest@
+1 exercise p7_alidisplay      @src/p7_alidisplay_utest@
+1 exercise p7_bg              @src/p7_bg_utest@
+1 exercise p7_domain          @src/p7_domain_utest@
+1 exercise p7_gmx             @src/p7_gmx_utest@
+1 exercise p7_hit             @src/p7_hit_utest@
+1 exercise p7_hmm             @src/p7_hmm_utest@
+1 exercise p7_hmmfile         @src/p7_hmmfile_utest@
+1 exercise p7_hmmd_search_stats @src/p7_hmmd_search_stats_utest@
+1 exercise p7_profile         @src/p7_profile_utest@
+1 exercise p7_tophits         @src/p7_tophits_utest@
+1 exercise p7_trace           @src/p7_trace_utest@
+1 exercise p7_scoredata       @src/p7_scoredata_utest@
+
+
+1 exercise decoding           @src/impl/decoding_utest@
+1 exercise fwdback            @src/impl/fwdback_utest@
+1 exercise io                 @src/impl/io_utest@
+1 exercise msvfilter          @src/impl/msvfilter_utest@
+1 exercise null2              @src/impl/null2_utest@
+1 exercise optacc             @src/impl/optacc_utest@
+1 exercise stotrace           @src/impl/stotrace_utest@
+1 exercise vitfilter          @src/impl/vitfilter_utest@
+1 exercise  hmmpgmd2msa       @src/hmmpgmd2msa_utest@     !testsuite/Caudal_act.hmm!
+# Still to come, unit tests for
+#   emit.c
+#   errors.c
+#   evalues.c
+#   eweight.c
+#   heatmap.c
+#   hmmer.c
+#   island.c
+#   modelstats.c
+#   mpisupport.c     (MPI testing needs to be handled specially)
+#   p7_bg.c
+#   p7_domaindef.c
+#   p7_prior.c
+#   p7_spensemble.c
+
+
+################################################################
+# Option tests 
+################################################################
+
+# Prep a press'ed "minifam" that's used here and also in some integration tests,
+# and extract an individual 'typical' model Caudal_act.
+1 prep      Caudal                @easel/miniapps/esl-afetch@ !testsuite/minifam! Caudal_act > %CAUDAL.STO%
+1 prep      hmm                   @src/bathbuild@ %CAUDAL.BHMM% %CAUDAL.STO%
+1 prep      minifam               @src/bathbuild@ %MINIFAM.BHMM% !testsuite/minifam!
+#1 prep      minifam_press         @src/hmmpress@ %MINIFAM.HMM% 
+
+
+# bathbuild  xxxxxxxxxxxxxxxxxxxx
+1 exercise  bathbuild            @src/bathbuild@                    --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/-h             @src/bathbuild@  -h
+1 exercise  build/-n             @src/bathbuild@  -n foo            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/-o             @src/bathbuild@  -o %HMMBUILD.out% --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/-O             @src/bathbuild@  -O %HMMBUILD.sto% --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--ct           @src/bathbuild@  --ct 11           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--unali        @src/bathbuild@  --unali           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/rndseq400-10.fa!
+1 exercise  build/--amino        @src/bathbuild@  --amino           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/M1.sto!
+1 exercise  build/--dna          @src/bathbuild@  --dna             --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/M1.sto!
+1 exercise  build/--rna          @src/bathbuild@  --rna             --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/M1.sto!
+1 exercise  build/--fast         @src/bathbuild@  --fast            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--hand         @src/bathbuild@  --hand            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--symfrac      @src/bathbuild@  --symfrac 1.0     --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--fragthresh   @src/bathbuild@  --fragthresh 0.4  --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--wpb          @src/bathbuild@  --wpb             --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--wgsc         @src/bathbuild@  --wgsc            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--wblosum      @src/bathbuild@  --wblosum         --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--wnone        @src/bathbuild@  --wnone           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+# --wgiven not tested
+1 exercise  build/--wid          @src/bathbuild@  --wblosum --wid 0.5  --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--eent         @src/bathbuild@  --eent               --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--eclust       @src/bathbuild@  --eclust             --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--enone        @src/bathbuild@  --enone              --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--eset         @src/bathbuild@  --eset 1.0           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--ere          @src/bathbuild@  --eent --ere  0.55   --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--esigma       @src/bathbuild@  --eent --esigma 44.0 --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--eid          @src/bathbuild@  --eclust --eid 0.60  --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--pnone        @src/bathbuild@  --pnone              --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--plaplace     @src/bathbuild@  --plaplace           --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EmL          @src/bathbuild@  --EmL 100                    --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EmN          @src/bathbuild@  --EmN 250            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EvL          @src/bathbuild@  --EvL 100            --EmL 10          --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EvN          @src/bathbuild@  --EvN 250            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EfL          @src/bathbuild@  --EfL 100            --EmL 10 --EvL 10          %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--EfN          @src/bathbuild@  --EfN 250            --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--Eft          @src/bathbuild@  --Eft 0.045          --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--informat     @src/bathbuild@  --informat stockholm --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+1 exercise  build/--seed         @src/bathbuild@  --seed 42             --EmL 10 --EvL 10 --EfL 10 %HMMBUILD.bhmm% !testsuite/20aa.sto!
+
+# bathsearch    xxxxxxxxxxxxxxxxxxxx
+1 prep      convert                    @src/bathconvert@ --ct 5                       %TESTCT%                        !testsuite/2OG-FeII_Oxy_3.bhmm!
+1 exercise  bathsearch                 @src/bathsearch@                               !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-h              @src/bathsearch@  -h
+1 exercise  bathsearch/-o              @src/bathsearch@  -o         %bathsearch.out%  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--tblout        @src/bathsearch@  --tblout   %bathsearch.tbl%  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--fstblout      @src/bathsearch@  --fstblout %bathsearch.fs%   !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--hmmout        @src/bathsearch@  --hmmout   %bathsearch.bhmm% !testsuite/2OG-FeII_Oxy_3.sto!  !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--acc           @src/bathsearch@  --acc                        !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--noali         @src/bathsearch@  --noali                      !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--notrans       @src/bathsearch@  --notrans                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--framelne      @src/bathsearch@  --frameline                  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--notextw       @src/bathsearch@  --notextw                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--textw         @src/bathsearch@  --textw 256                  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--ct            @src/bathsearch@  --ct 5                       %TESTCT%                        !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-l              @src/bathsearch@  -l -95                       !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-m              @src/bathsearch@  -m                           !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-M              @src/bathsearch@  -M                           !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/topstrand       @src/bathsearch@  --strand plus                !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/botstrand       @src/bathsearch@  --strand minus               !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-E              @src/bathsearch@  -E 0.01                      !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-T              @src/bathsearch@  -T 20                        !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--incE          @src/bathsearch@  --incE 0.01                  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--incT          @src/bathsearch@  --incT 20                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--max           @src/bathsearch@  --max                        !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--F1            @src/bathsearch@  --F1 0.03                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--F2            @src/bathsearch@  --F2 0.002                   !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--F3            @src/bathsearch@  --F3 0.0002                  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--nobias        @src/bathsearch@  --nobias                     !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--nonull2       @src/bathsearch@  --nonull2                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--nofs          @src/bathsearch@  --nofs                       !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--fsonly        @src/bathsearch@  --fsonly                     !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--qformat       @src/bathsearch@  --qformat stockholm          !testsuite/2OG-FeII_Oxy_3.sto!  !testsuite/2OG-FeII_Oxy_3-nt.fa! 
+1 exercise  bathsearch/--qsingle       @src/bathsearch@  --qsingle_seqs               !testsuite/2OG-FeII_Oxy_3.sto!  !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--tformat       @src/bathsearch@  --tformat fasta              !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--popen         @src/bathsearch@  --popen 0.4                  !testsuite/2OG-FeII_Oxy_3.fa!   !testsuite/2OG-FeII_Oxy_3-nt.fa! 
+1 exercise  bathsearch/--pextend       @src/bathsearch@  --pextend 0.6                !testsuite/2OG-FeII_Oxy_3.fa!   !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--mx            @src/bathsearch@  --mx PAM30                   !testsuite/2OG-FeII_Oxy_3.fa!  !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--mxfile        @src/bathsearch@  --mxfile !easel/formats/BLOSUM62! !testsuite/2OG-FeII_Oxy_3.fa!  !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/-Z              @src/bathsearch@  -Z 45000000                  !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa!
+1 exercise  bathsearch/--seed          @src/bathsearch@  --seed 42                    !testsuite/2OG-FeII_Oxy_3.bhmm! !testsuite/2OG-FeII_Oxy_3-nt.fa! 
+
+# xxxxxxxxx xxxxxxxxxxxxxxxxxxxx
+1 exercise  bathfetch             @src/bathfetch@   %MINIFAM.BHMM% Caudal_act
+1 exercise  bathstat              @src/bathstat@    !testsuite/Caudal_act.bhmm!
+1 exercise  bathconvert           @src/bathconvert@ %CAUDAL.bhmm% !testsuite/Caudal_act.hmm!
+
+#################################################################
+# Integration tests
+################################################################
+
+# Run-to-run variation tests
+# By default, stochastic simulations are seeded reproducibly, so there
+# is no run-to-run variation; whereas with different RNG seeds,
+# run-to-run variation does occur. [xref J5/99]
+# The hmmemit seed of 35 is carefully chosen to generate a target sequence
+# that requires stochastic clustering when aligned to the Caudal_act.hmm test
+# To search for new seeds, the command line is something like:
+# ( ../src/hmmemit --seed 35 -p Caudal_act.hmm | ../src/hmmsearch --seed 2 --tblout foo.out Caudal_act.hmm - > /dev/null ; cat foo.out )
+# looking for high scoring sequences that force a stochastic clustering step.
+#
+#           xxxxxxxxxxxxxxxxxxxx
+1 exercise  bathbuild_variation    !testsuite/i1-build-variation.sh!     @src/bathbuild@   !testsuite/Caudal_act.sto!          %OUTFILES%
+1 exercise  bathsearch_variation   !testsuite/i2-search-variation.sh!    @src/bathsearch@  %CAUDAL.BHMM%   !testsuite/Caudal_act-nt.fa!  %OUTFILES%
+1 exercise  fragments              !testsuite/i7-bathbuild-fragments.pl! @src/bathbuild@               %OUTFILES%
+1 exercise  nonresidues            !testsuite/i8-nonresidues.pl!         @@ !! %OUTFILES%
+1 exercise  opt-annotation         !testsuite/i9-optional-annotation.pl! @@ !! %OUTFILES%
+1 exercise  dup-names             !testsuite/i10-duplicate-names.pl!    @@ !! %OUTFILES%
+1 exercise  stdin_pipes           !testsuite/i17-stdin.pl!              @@ !! %OUTFILES%
+#1 exercise  brute-itest           @src/itest_brute@  
+
+################################################################
+# valgrind tests  (optional. 'make SQCLEVEL=3 check')
+################################################################
+
+#           xxxxxxxxxxxxxxxxxxxx
+3 valgrind  hmmer                 @src/hmmer_utest@
+3 valgrind  build                 @src/build_utest@
+3 valgrind  generic_fwdback       @src/generic_fwdback_utest@
+3 valgrind  generic_msv           @src/generic_msv_utest@
+3 valgrind  generic_stotrace      @src/generic_stotrace_utest@
+3 valgrind  generic_viterbi       @src/generic_viterbi_utest@
+3 valgrind  logsum                @src/logsum_utest@
+3 valgrind  modelconfig           @src/modelconfig_utest@
+3 valgrind  p7_alidisplay         @src/p7_alidisplay_utest@
+3 valgrind  p7_bg                 @src/p7_bg_utest@
+3 valgrind  p7_gmx                @src/p7_gmx_utest@
+3 valgrind  p7_hmm                @src/p7_hmm_utest@
+3 valgrind  p7_hmmfile            @src/p7_hmmfile_utest@
+3 valgrind  p7_profile            @src/p7_profile_utest@
+3 valgrind  p7_tophits            @src/p7_tophits_utest@
+3 valgrind  p7_trace              @src/p7_trace_utest@
+
+3 valgrind  decoding              @src/impl/decoding_utest@
+3 valgrind  fwdback               @src/impl/fwdback_utest@
+3 valgrind  io                    @src/impl/io_utest@
+3 valgrind  msvfilter             @src/impl/msvfilter_utest@
+3 valgrind  null2                 @src/impl/null2_utest@
+3 valgrind  optacc                @src/impl/optacc_utest@
+3 valgrind  stotrace              @src/impl/stotrace_utest@
+3 valgrind  vitfilter             @src/impl/vitfilter_utest@
+
+1 prep      minifam               @src/bathbuild@ %MINIFAM.HMM% !testsuite/minifam!
+
+3 valgrind  bathbuild             @src/bathbuild@   %GLOBIN.HMM% !testsuite/globins4.sto!
+3 valgrind  bathconvert           @src/bathconvert@ %M1.BHMM% !testsuite/M1.hmm!
+3 valgrind  bathfetch             @src/bathfetch@   %MINIFAM.HMM% Caudal_act
+3 valgrind  bathsearch            @src/bathsearch@  %GLOBIN.HMM% !testsuite/globins45-nt.fa!
+3 valgrind  bathstat              @src/bathstat@    %MINIFAM.HMM% 
+
