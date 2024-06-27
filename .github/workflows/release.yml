@@ -71,7 +71,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v1
         with:
-          name: BATH-${{ matrix.os }}-${{ matrix.arch }}
+          name: BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
           path: ./artifacts
 
       - name: List downloaded artifacts
