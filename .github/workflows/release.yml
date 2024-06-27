@@ -71,10 +71,17 @@ jobs:
           mkdir -p ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
           mv ./src/* ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
 
+      - name: Prepare list of files to upload
+        id: prepare_files
+        run: |
+          files=$(find ./artifacts -type f | paste -sd ",")
+          echo "files=$files" >> $GITHUB_ENV
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
+          files: ${{ env.files }}
+          tag_name: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
