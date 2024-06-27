@@ -1,0 +1,197 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers the workflow when a tag starting with 'v' is pushed
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        arch:
+          - x86
+          - x64
+          - arm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up build environment - Ubuntu & MacOS
+        run: |
+          if [ "${{ matrix.os }}" == 'ubuntu-latest' ]; then
+            sudo apt-get update
+            sudo apt-get install -y autoconf gcc make
+          elif [ "${{ matrix.os }}" == 'macos-latest' ]; then
+            brew install autoconf gcc make
+          fi
+      - name: Clone Easel repository
+        run: |
+          git clone https://github.com/TravisWheelerLab/easel
+          cd easel
+          git checkout BATH
+          cd ..
+      - name: Run autoconf
+        shell: bash
+        run: autoconf
+
+      - name: Configure
+        shell: bash
+        run: ./configure
+
+      - name: Build
+        shell: bash
+        run: make
+
+      - name: List contents of src directory
+        run: ls -l src
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: BATH-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            src/bathsearch
+            src/bathbuild
+            src/bathconvert
+            src/bathfetch
+            src/bathstat
+            src/hmmer
+            src/hmmalign
+            src/hmmbuild
+            src/hmmconvert
+            src/hmmemit
+            src/hmmfetch
+            src/hmmlogo
+            src/hmmpgmd
+            src/hmmpgmd_shard
+            src/hmmpress
+            src/hmmscan
+            src/hmmsearch
+            src/hmmsim
+            src/hmmstat
+            src/jackhmmer
+            src/makehmmerdb
+            src/phmmer
+            src/hmmsearcht
+            src/hmmscant
+            src/nhmmer
+            src/nhmmscan
+            src/alimask
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Ubuntu x86 artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-ubuntu-latest-x86
+          path: ./artifacts/ubuntu/x86
+
+      - name: Download Ubuntu x64 artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-ubuntu-latest-x64
+          path: ./artifacts/ubuntu/x64
+
+      - name: Download Ubuntu ARM artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-ubuntu-latest-arm
+          path: ./artifacts/ubuntu/arm
+
+      - name: Download macOS x86 artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-macos-latest-x86
+          path: ./artifacts/macos/x86
+
+      - name: Download macOS x64 artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-macos-latest-x64
+          path: ./artifacts/macos/x64
+
+      - name: Download macOS ARM artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: BATH-macos-latest-arm
+          path: ./artifacts/macos/arm
+
+      - name: Create Release
+        uses: elgohr/Github-Release-Action@v5
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          title: Release ${{ github.ref }}
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+      - name: Upload Ubuntu x86 Release Assets
+        uses: softprops/action-gh-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/ubuntu/x86
+          asset_name: BATH-ubuntu-latest-x86
+          asset_content_type: application/octet-stream
+
+      - name: Upload Ubuntu x64 Release Assets
+        uses: softprops/action-gh-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/ubuntu/x64
+          asset_name: BATH-ubuntu-latest-x64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Ubuntu ARM Release Assets
+        uses: softprops/action-gh-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/ubuntu/arm
+          asset_name: BATH-ubuntu-latest-arm
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS x86 Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos/x86
+          asset_name: BATH-macos-latest-x86
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS x64 Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos/x64
+          asset_name: BATH-macos-latest-x64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS ARM Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos/arm
+          asset_name: BATH-macos-latest-arm
+          asset_content_type: application/octet-stream
