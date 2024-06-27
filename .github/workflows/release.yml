@@ -43,12 +43,6 @@ jobs:
       - name: Build
         run: make
 
-      - name: Print current directory after make
-        run: pwd
-
-      - name: List contents of src directory
-        run: ls -l src
-
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -69,19 +63,29 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         arch: [x86, x64, arm]
     steps:
-      - name: Download build artifacts
-        run: |
-          mkdir -p ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
-          mv ./src/* ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
-          echo "Listing files in ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/:"
-          ls -l ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
+      - uses: actions/checkout@v3
 
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
+      - name: Download build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: BATH-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./
+
+      - name: Create Release
+        uses: actions/create-release@master
+        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/bathsearch
+          release_name: Release ${{ github.ref }}
           tag_name: ${{ github.ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/BATH-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          asset_name: BATH-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+          asset_content_type: application/octet-stream
