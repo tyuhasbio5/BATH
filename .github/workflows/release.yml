@@ -74,6 +74,10 @@ jobs:
           name: BATH-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts
 
+      - name: List downloaded artifacts
+        run: |
+          ls -l ./artifacts
+
       - name: Create Release
         uses: actions/create-release@master
         id: create_release
