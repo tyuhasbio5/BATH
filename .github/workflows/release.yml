@@ -61,28 +61,6 @@ jobs:
             src/bathconvert
             src/bathfetch
             src/bathstat
-            src/hmmer
-            src/hmmalign
-            src/hmmbuild
-            src/hmmconvert
-            src/hmmemit
-            src/hmmfetch
-            src/hmmlogo
-            src/hmmpgmd
-            src/hmmpgmd_shard
-            src/hmmpress
-            src/hmmscan
-            src/hmmsearch
-            src/hmmsim
-            src/hmmstat
-            src/jackhmmer
-            src/makehmmerdb
-            src/phmmer
-            src/hmmsearcht
-            src/hmmscant
-            src/nhmmer
-            src/nhmmscan
-            src/alimask
           if-no-files-found: error
 
   release:
