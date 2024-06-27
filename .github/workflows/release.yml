@@ -72,18 +72,17 @@ jobs:
           mv ./src/* ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
 
       - name: Create Release
-        uses: elgohr/Github-Release-Action@v5
+        id: create_release
+        uses: shogo82148/actions-create-release@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          title: Release ${{ github.ref }}
 
       - name: Upload Release Assets
         uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
           asset_name: BATH-${{ matrix.os }}-${{ matrix.arch }}
           asset_content_type: application/octet-stream
