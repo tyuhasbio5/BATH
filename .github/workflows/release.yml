@@ -72,22 +72,24 @@ jobs:
           mv ./src/* ./artifacts/${{ matrix.os }}/${{ matrix.arch }}/
 
       - name: Create Release
-        id: create_release
         uses: elgohr/Github-Release-Action@v5
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           title: Release ${{ github.ref }}
 
-      - name: Set Release Upload URL
-        run: echo "upload_url=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.github.token }}
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ env.upload_url }}
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
           asset_name: BATH-${{ matrix.os }}-${{ matrix.arch }}
           asset_content_type: application/octet-stream
