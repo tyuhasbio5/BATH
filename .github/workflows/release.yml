@@ -69,9 +69,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         arch: [x86, x64, arm]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Download build artifacts
         run: |
           mkdir -p ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
