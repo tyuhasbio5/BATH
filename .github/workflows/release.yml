@@ -41,18 +41,20 @@ jobs:
         run: ./configure
 
       - name: Build
-        run: make
+        run: |
+          make
+          cd src && make install DESTDIR=../installation
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: BATH-${{ matrix.os }}-${{ matrix.arch }}
           path: |
-            src/bathsearch
-            src/bathbuild
-            src/bathconvert
-            src/bathfetch
-            src/bathstat
+            installation/usr/local/bin/bathsearch
+            installation/usr/local/bin/bathbuild
+            installation/usr/local/bin/bathconvert
+            installation/usr/local/bin/bathfetch
+            installation/usr/local/bin/bathstat
           if-no-files-found: error
 
   release:
@@ -68,8 +70,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v1
         with:
-          name: BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
-          path: ./
+          name: BATH-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./artifacts
 
       - name: Create Release
         uses: actions/create-release@master
