@@ -43,6 +43,7 @@ jobs:
       - name: Build
         run: |
           make
+          mkdir installation
           cd src && make install DESTDIR=../installation
 
       - name: Archive build artifacts
