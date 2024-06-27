@@ -54,28 +54,6 @@ jobs:
             src/bathconvert
             src/bathfetch
             src/bathstat
-            src/hmmer
-            src/hmmalign
-            src/hmmbuild
-            src/hmmconvert
-            src/hmmemit
-            src/hmmfetch
-            src/hmmlogo
-            src/hmmpgmd
-            src/hmmpgmd_shard
-            src/hmmpress
-            src/hmmscan
-            src/hmmsearch
-            src/hmmsim
-            src/hmmstat
-            src/jackhmmer
-            src/makehmmerdb
-            src/phmmer
-            src/hmmsearcht
-            src/hmmscant
-            src/nhmmer
-            src/nhmmscan
-            src/alimask
           if-no-files-found: error
 
   release:
@@ -86,10 +64,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: softprops/action-gh-release@v1
+        id: download_assets
         with:
-          name: BATH-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts
+          files: |
+            ./artifacts/${{ matrix.os }}/x86/BATH-${{ matrix.os }}-latest-x86
+            ./artifacts/${{ matrix.os }}/x64/BATH-${{ matrix.os }}-latest-x64
+            ./artifacts/${{ matrix.os }}/arm/BATH-${{ matrix.os }}-latest-arm
+          tag_name: ${{ github.ref }}
 
       - name: Create Release
         uses: elgohr/Github-Release-Action@v5
