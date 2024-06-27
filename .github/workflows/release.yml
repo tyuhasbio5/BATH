@@ -79,12 +79,15 @@ jobs:
         with:
           title: Release ${{ github.ref }}
 
+      - name: Set Release Upload URL
+        run: echo "upload_url=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
+
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ env.upload_url }}
           asset_path: ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
           asset_name: BATH-${{ matrix.os }}-${{ matrix.arch }}
           asset_content_type: application/octet-stream
