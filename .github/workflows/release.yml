@@ -70,6 +70,8 @@ jobs:
         run: |
           mkdir -p ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
           mv ./src/* ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
+          echo "Listing files in ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/:"
+          ls -l ./artifacts/${{ matrix.os }}-${{ matrix.arch }}/
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
