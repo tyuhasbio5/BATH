@@ -59,6 +59,11 @@ jobs:
   release:
     needs: build
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        arch: [x86, x64, arm]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
