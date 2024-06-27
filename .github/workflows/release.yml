@@ -43,6 +43,12 @@ jobs:
       - name: Build
         run: make
 
+      - name: Print current directory after make
+        run: pwd
+
+      - name: List contents of src directory
+        run: ls -l src
+
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
