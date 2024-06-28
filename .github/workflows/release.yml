@@ -52,14 +52,17 @@ jobs:
         env:
           MSYSTEM: MINGW64
 
-      - name: Configure
+      - name: Run configure on Windows
+        if: matrix.os == 'windows-latest'
         run: ./configure
-        shell: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            msys2 {0}
-          else
-            bash
-          fi
+        shell: msys2 {0}
+        env:
+          MSYSTEM: MINGW64
+
+      - name: Run configure on Ubuntu and macOS
+        if: matrix.os != 'windows-latest'
+        run: ./configure
+        shell: bash
 
       - name: Build
         run: |
