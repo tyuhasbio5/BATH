@@ -28,6 +28,7 @@ jobs:
             echo "C:\tools\msys64\usr\bin" >> $GITHUB_PATH
             echo "C:\tools\msys64\mingw64\bin" >> $GITHUB_PATH
             echo "C:\tools\msys64\mingw32\bin" >> $GITHUB_PATH
+            echo 'export PATH=$PATH:/c/tools/msys64/usr/bin:/c/tools/msys64/mingw64/bin:/c/tools/msys64/mingw32/bin' >> $GITHUB_ENV
             pacman -S autotools
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
