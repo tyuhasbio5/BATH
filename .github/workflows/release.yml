@@ -49,9 +49,17 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: autoconf
         shell: msys2 {0}
+        env:
+          MSYSTEM: MINGW64
 
       - name: Configure
         run: ./configure
+        shell: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            msys2 {0}
+          else
+            bash
+          fi
 
       - name: Build
         run: |
