@@ -13,6 +13,12 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         arch: [x86, x64, arm]
     steps:
+      - name: Set git to use LF
+        if: matrix.os == 'windows-latest'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: Checkout code
         uses: actions/checkout@v3
       
