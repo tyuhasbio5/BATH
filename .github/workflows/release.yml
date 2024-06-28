@@ -46,16 +46,16 @@ jobs:
           mkdir -p installation/usr/local/bin
           cd src && make install DESTDIR=../installation
 
+      - name: Create tar.gz archive
+        run: |
+          cd installation/usr/local/bin
+          tar -czvf ../../../../BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
+
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: BATH-${{ matrix.os }}-${{ matrix.arch }}
-          path: |
-            installation/usr/local/bin/bathsearch
-            installation/usr/local/bin/bathbuild
-            installation/usr/local/bin/bathconvert
-            installation/usr/local/bin/bathfetch
-            installation/usr/local/bin/bathstat
+          path: BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz
           if-no-files-found: error
 
   release:
@@ -84,8 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            ./artifacts/BATH-${{ matrix.os }}-${{ matrix.arch }}/*
+          files: ./artifacts/BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
