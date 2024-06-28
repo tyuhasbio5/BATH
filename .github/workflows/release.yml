@@ -48,8 +48,8 @@ jobs:
 
       - name: Create tar.gz archive
         run: |
-          cd installation/usr/local/bin
-          tar -czvf ../../../../BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
+          cd installation
+          tar -czvf BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
