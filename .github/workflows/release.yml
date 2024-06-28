@@ -70,7 +70,18 @@ jobs:
         run: ./configure
         shell: bash
 
-      - name: Build
+      - name: Build on Windows
+        if: matrix.os == 'windows-latest'
+        shell: msys2 {0}
+        env:
+          MSYSTEM: MINGW64
+        run: |
+          make
+          mkdir -p installation/usr/local/bin
+          cd src && make install DESTDIR=../installation
+
+      - name: Build on Ubuntu and macOS
+        if: matrix.os != 'windows-latest'
         run: |
           make
           mkdir -p installation/usr/local/bin
