@@ -71,13 +71,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
+          pattern: BATH-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts
-
-      - name: List downloaded artifacts
-        run: |
-          echo "Listing files in ./artifacts/${{ matrix.os }}-${{ matrix.arch }}:"
-          ls -l ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Create Release
         uses: actions/create-release@master
@@ -94,6 +89,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
+          asset_path: ./artifacts/BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
           asset_name: BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
           asset_content_type: application/octet-stream
