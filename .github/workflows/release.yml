@@ -23,19 +23,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y autoconf gcc make
           elif [ ${{ matrix.os }} == 'windows-latest' ]; then
-            # Set up MSYS2 and install autoconf
-            pacman --version || true  # Check if pacman is available (optional)
-            echo "Setting up MSYS2"
-            # Install MSYS2 and necessary packages
-            # You may need to customize this based on MSYS2 installation steps
-            curl -L -o msys2-setup-x86_64.exe https://github.com/msys2/msys2-installer/releases/download/2024-05-07/msys2-base-x86_64-20240507.sfx.exe
-            ./msys2-setup-x86_64.exe -y -oC:\
-            # Refresh environment variables
-            source /etc/profile.d/msys2.sh
-            # Update MSYS2 packages
-            pacman --noconfirm -Syu
-            # Install necessary packages
-            pacman --noconfirm -S mingw-w64-x86_64-toolchain autoconf automake libtool
+            - uses: msys2/setup-msys2@v2
+              shell: msys2 {0}
+              with:
+                install: autoconf
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
