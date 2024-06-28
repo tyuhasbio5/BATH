@@ -24,6 +24,7 @@ jobs:
             sudo apt-get install -y autoconf gcc make
           elif [ ${{ matrix.os }} == 'windows-latest' ]; then
             choco install -y msys2
+            pacman -S autotools
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
