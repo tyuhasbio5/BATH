@@ -46,7 +46,7 @@ jobs:
       
       - name: Add msys2 Bash to PATH
         if: matrix.os == 'windows-latest'
-        shell: msys2bash.cmd
+        shell: msys2 {0}
         run: |
           echo "export PATH=/c/msys64/usr/bin:$PATH" >> $GITHUB_ENV
 
