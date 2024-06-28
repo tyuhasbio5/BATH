@@ -74,6 +74,11 @@ jobs:
           pattern: BATH-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts
 
+      - name: List files in artifacts directory
+        run: |
+          echo "Listing files in ./artifacts:"
+          ls -l ./artifacts
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         env:
