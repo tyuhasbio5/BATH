@@ -22,17 +22,16 @@ jobs:
           if [ ${{ matrix.os }} == 'ubuntu-latest' ]; then
             sudo apt-get update
             sudo apt-get install -y autoconf gcc make
-          elif [ ${{ matrix.os }} == 'windows-latest' ]; then
-            choco install -y msys2
-            echo "Adding MSYS2 to PATH"
-            echo "C:\tools\msys64\usr\bin" >> $GITHUB_PATH
-            echo "C:\tools\msys64\mingw64\bin" >> $GITHUB_PATH
-            echo "C:\tools\msys64\mingw32\bin" >> $GITHUB_PATH
-            echo 'export PATH=$PATH:/c/tools/msys64/usr/bin:/c/tools/msys64/mingw64/bin:/c/tools/msys64/mingw32/bin' >> $GITHUB_ENV
-            pacman -S autotools
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
+
+      - name: Set up MSYS2
+        if: matrix.os == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-toolchain autoconf automake libtool
 
       - name: Clone Easel repository
         run: |
@@ -42,8 +41,13 @@ jobs:
           cd ..
 
       - name: Run autoconf
-        shell: bash
         run: autoconf
+        shell: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            msys2 {0}
+          else
+            bash
+          fi
 
       - name: Configure
         run: ./configure
