@@ -14,7 +14,7 @@ jobs:
         arch: [x86, x64, arm]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Set up build environment
         shell: bash
@@ -36,6 +36,7 @@ jobs:
           cd ..
 
       - name: Run autoconf
+        shell: bash
         run: autoconf
 
       - name: Configure
