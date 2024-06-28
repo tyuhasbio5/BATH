@@ -23,8 +23,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y autoconf gcc make
           elif [ ${{ matrix.os }} == 'windows-latest' ]; then
-            choco install make mingw 
-            pacman -S autoconf
+            pacman --noconfirm -Suy
+            pacman --noconfirm -S mingw-w64-x86_64-toolchain autoconf automake libtool
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
