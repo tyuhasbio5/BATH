@@ -80,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./artifacts/BATH-${{ matrix.os }}-${{ matrix.arch }}.zip
+            ./artifacts/BATH-${{ matrix.os }}-${{ matrix.arch }}*
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
