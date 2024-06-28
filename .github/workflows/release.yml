@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         arch: [x86, x64, arm]
     steps:
       - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y autoconf gcc make
           elif [ ${{ matrix.os }} == 'windows-latest' ]; then
-            choco install make mingw
+            choco install make mingw 
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
@@ -45,14 +45,20 @@ jobs:
           make
           mkdir -p installation/usr/local/bin
           cd src && make install DESTDIR=../installation
+
       - name: Extract version from github.ref
         id: extract_version
         run: echo "::set-output name=version::$(echo ${GITHUB_REF#refs/tags/})"
 
       - name: Create tar.gz archive
         run: |
-          cd installation/usr/local/bin
-          tar -czvf ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
+          if [ ${{ matrix.os }} == 'windows-latest' ]; then
+            cd installation/usr/local/bin
+            zip -r ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.zip bathsearch.exe bathbuild.exe bathconvert.exe bathfetch.exe bathstat.exe
+          else
+            cd installation/usr/local/bin
+            tar -czvf ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
+          fi
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
@@ -66,7 +72,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         arch: [x86, x64, arm]
     steps:
       - uses: actions/checkout@v3
