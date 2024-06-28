@@ -55,15 +55,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: autoconf
         shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
+        with:
+          msystem: UCRT64
 
       - name: Run configure on Windows
         if: matrix.os == 'windows-latest'
         run: ./configure
         shell: msys2 {0}
-        env:
-          MSYSTEM: MINGW64
+        with:
+          msystem: UCRT64
 
       - name: Run configure on Ubuntu and macOS
         if: matrix.os != 'windows-latest'
@@ -72,11 +72,11 @@ jobs:
 
       - name: Build on Windows
         if: matrix.os == 'windows-latest'
-        shell: bash
-        env:
-          MSYSTEM: MINGW64
+        shell: msys2 {0}
+        with:
+          msystem: UCRT64
         run: |
-          make
+          msys2 -c 'make'
           mkdir -p installation/usr/local/bin
           cd src && make install DESTDIR=../installation
 
