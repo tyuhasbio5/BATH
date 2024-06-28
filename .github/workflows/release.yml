@@ -10,20 +10,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         arch: [x86, x64, arm]
     steps:
-      - name: Set git to use LF
-        if: matrix.os == 'windows-latest'
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up build environment
-        shell: bash
         run: |
           if [ ${{ matrix.os }} == 'ubuntu-latest' ]; then
             sudo apt-get update
@@ -31,70 +24,31 @@ jobs:
           elif [ ${{ matrix.os }} == 'macos-latest' ]; then
             brew install autoconf gcc make
           fi
-
       - name: Clone Easel repository
         run: |
           git clone https://github.com/TravisWheelerLab/easel
           cd easel
           git checkout BATH
           cd ..
-
-      - name: Run autoconf on Ubuntu and macOS
-        if: matrix.os != 'windows-latest'
+      - name: Run autoconf
         run: autoconf
-        shell: bash
-      
-      - name: Add msys2 Bash to PATH
-        if: matrix.os == 'windows-latest'
-        shell: msys2bash.cmd
-        run: |
-          echo "export PATH=/c/msys64/usr/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Run autoconf on Windows
-        if: matrix.os == 'windows-latest'
-        run: autoconf
-        shell: msys2 {0}
-
-      - name: Run configure on Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          ./configure
-        shell: msys2 {0}
-
-      - name: Run configure on Ubuntu and macOS
-        if: matrix.os != 'windows-latest'
+      - name: Configure
         run: ./configure
-        shell: bash
 
-      - name: Build on Windows
-        if: matrix.os == 'windows-latest'
-        shell: msys2 {0}
+      - name: Build
         run: |
           make
           mkdir -p installation/usr/local/bin
           cd src && make install DESTDIR=../installation
-
-      - name: Build on Ubuntu and macOS
-        if: matrix.os != 'windows-latest'
-        run: |
-          make
-          mkdir -p installation/usr/local/bin
-          cd src && make install DESTDIR=../installation
-
       - name: Extract version from github.ref
         id: extract_version
         run: echo "::set-output name=version::$(echo ${GITHUB_REF#refs/tags/})"
 
       - name: Create tar.gz archive
         run: |
-          if [ ${{ matrix.os }} == 'windows-latest' ]; then
-            cd installation/usr/local/bin
-            zip -r ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.zip bathsearch.exe bathbuild.exe bathconvert.exe bathfetch.exe bathstat.exe
-          else
-            cd installation/usr/local/bin
-            tar -czvf ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
-          fi
-
+          cd installation/usr/local/bin
+          tar -czvf ../../../BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz bathsearch bathbuild bathconvert bathfetch bathstat
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -107,7 +61,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         arch: [x86, x64, arm]
     steps:
       - uses: actions/checkout@v3
@@ -122,7 +76,6 @@ jobs:
         run: |
           echo "Listing files in ./artifacts:"
           ls -l ./artifacts
-
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         env:
