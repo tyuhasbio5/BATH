@@ -87,7 +87,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ./artifacts/BATH-${{ github.ref }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
+          files: ./artifacts/BATH-${{ steps.extract_version.outputs.version }}.${{ matrix.os }}.${{ matrix.arch }}.tar.gz
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          name: Release ${{ steps.extract_version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
