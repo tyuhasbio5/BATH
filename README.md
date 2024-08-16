@@ -1,3 +1,5 @@
+## NOT THE REAL REPO.  THIS IS A TEST FOR GITHUB ACTIONS
+
 ## BATH - Better Alignments with Translated HMMER
 
 Are you tired of searching your genomes over and over but never getting out all those pesky proteins? Well, fret no more. Just give your genome a BATH!
